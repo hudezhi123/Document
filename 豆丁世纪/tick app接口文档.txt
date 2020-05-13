@@ -61,7 +61,8 @@ AUTH.PHONE_NUMBER_HAS_BIND	- 手机号已被三方其他账号绑定
 AUTH.THIRD_ACCOUNT_HAS_BIND	- 三方账号已被其他手机号绑定
 AUTH.INVALID_IMAGE_CODE		- 图形验证码不正确
 AUTH.ACCOUNT_PASSWORD_ERROR 	- 账号或密码不正确
-AUTH.PASSWORD_ERROR 		- 密码不正确	
+AUTH.PASSWORD_ERROR 		- 密码不正确
+SUBS.BLOCKED_BY_USER		- 已被用户拉黑。
 SYSTEM_ERROR 			- 系统错误
 INVALID_PARAMETER 		- 参数无效
 
@@ -1384,6 +1385,9 @@ URL：/user/user_center
 	"sub_msg":"",
 	"content":
 	{
+		"is_subscribe":true // 是否订阅了用户，true已订阅，false未订阅。
+		"is_block_user":true, // 是否拉黑了用户。
+		"is_block_me":true, // 是否被用户拉黑了。
 		"story_num":5, // 作品数量
 		"fans_num":2,	// 粉丝数量
 		"subscribe_num":3 // 订阅数量
@@ -1555,6 +1559,7 @@ URL：/subscription/subscribe_user
 INVALID_ACCESS_TOKEN
 
 - 40004
+SUBS.BLOCKED_BY_USER
 INVALID_PARAMETER
 SYSTEM_ERROR
 
