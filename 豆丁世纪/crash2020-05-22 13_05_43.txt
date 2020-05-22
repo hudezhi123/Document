@@ -1,0 +1,28 @@
+2020-05-22 13:05:43
+App Version: 1.0_3
+OS Version: 10_29Vendor: HUAWEIModel: VOG-AL10
+CPU ABI: armeabi-v7a
+
+io.reactivex.exceptions.UndeliverableException: The exception could not be delivered to the consumer because it has already canceled/disposed the flow or the exception has nowhere to go to begin with. Further reading: https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0#error-handling | java.lang.OutOfMemoryError
+	at io.reactivex.plugins.RxJavaPlugins.onError(RxJavaPlugins.java:367)
+	at io.reactivex.internal.schedulers.ScheduledRunnable.run(ScheduledRunnable.java:69)
+	at io.reactivex.internal.schedulers.ScheduledRunnable.call(ScheduledRunnable.java:57)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:301)
+	at java.util.concurrent.ThreadPoolExecutor.processTask(ThreadPoolExecutor.java:1187)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1152)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)
+	at java.lang.Thread.run(Thread.java:929)
+Caused by: java.lang.OutOfMemoryError
+	at android.graphics.Bitmap.nativeCreate(Native Method)
+	at android.graphics.Bitmap.createBitmap(Bitmap.java:1291)
+	at android.graphics.Bitmap.createBitmap(Bitmap.java:1104)
+	at com.docin.ayouvideo.util.ImageUtils.scale(ImageUtils.java:389)
+	at com.docin.ayouvideo.util.ImageUtils.scale(ImageUtils.java:370)
+	at com.docin.ayouvideo.feature.make.ui.StoryRecordActivity$13.subscribe(StoryRecordActivity.java:904)
+	at io.reactivex.internal.operators.observable.ObservableCreate.subscribeActual(ObservableCreate.java:40)
+	at io.reactivex.Observable.subscribe(Observable.java:12284)
+	at io.reactivex.internal.operators.observable.ObservableSubscribeOn$SubscribeTask.run(ObservableSubscribeOn.java:96)
+	at io.reactivex.Scheduler$DisposeTask.run(Scheduler.java:578)
+	at io.reactivex.internal.schedulers.ScheduledRunnable.run(ScheduledRunnable.java:66)
+	... 7 more
