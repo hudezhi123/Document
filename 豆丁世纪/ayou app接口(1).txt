@@ -1,0 +1,1500 @@
+接口采用http协议+json数据格式，使用utf-8编码
+
+请求地址：
+	正式环境：http://ayou.docin.com/app/api/
+	开发环境：http://1.202.223.2:808/tomcat53/webapp/api/app/
+
+请求体结构：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 接口访问token（可选，登录成功后携带该参数）
+	"version":"1.00", // 接口版本号（必选）
+	"app_version":"1.0", // app版本号 （必选）
+	"platform":"iPhone", // 平台标识：iPhone, iPad, Android（必选）
+	"udid":"", // 设备标识（必选）
+	"content" // 业务数据
+	{
+		
+	}
+}
+
+响应体结构：
+{
+	"code":"0", 	// 公共返回码
+	"msg":"success",
+	"sub_code":"", 	// 业务错误码，客户端转大写后再判断。
+	"sub_msg":"",
+	"content"	// 返回业务数据
+	{
+		
+	}
+}
+
+-------- code定义：--------
+0 - 处理成功
+10001 - 缺少必选参数
+10002 - 非法的参数
+10003 - 授权权限不足
+20000 - 服务不可用
+40004 - 业务处理失败
+
+-------- sub_code定义 --------
+code=10001的sub_code定义：
+MISSING_PARAMETER 		- 缺少必选参数
+
+code=10002的sub_code定义：
+INVALID_PARAMETER 		- 非法的参数
+
+code=10003的sub_code定义：
+INVALID_ACCESS_TOKEN 		- 无效的访问令牌，用户需重新登录
+
+code=20000的sub_code定义：
+UNKNOW_ERROR 			- 系统未知错误
+
+code=40004的sub_code定义：
+AUTH.INVALID_PHONE_NUMBER 	- 手机号码格式不正确
+AUTH.INVALID_PASSWORD 		- 密码长度需为6-20位
+AUTH.NEW_PASSWORD_EQUAL_ORIGINAL- 重置密码与原密码相同
+AUTH.ACCOUNT_EXISTS 		- 手机号码已被注册
+AUTH.ACCOUNT_NOT_EXISTS 	- 账号不存在
+AUTH.VERIFY_CODE_ERROR 		- 短信验证码不正确
+AUTH.PHONE_NUMBER_HAS_BIND	- 手机号已被三方其他账号绑定
+AUTH.THIRD_ACCOUNT_HAS_BIND	- 三方账号已被其他手机号绑定
+AUTH.INVALID_IMAGE_CODE		- 图形验证码不正确
+AUTH.ACCOUNT_PASSWORD_ERROR 	- 账号或密码不正确
+AUTH.PASSWORD_ERROR 		- 密码不正确
+SYSTEM_ERROR 			- 系统错误
+INVALID_PARAMETER 		- 参数无效
+
+-------- 用户登录接口 --------
+描述：
+URL：/login
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"phone_number":"18911548237",
+		"pwd":"123456" // MD5 32位加密
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // 
+	"sub_msg":"",
+	"content":
+	{
+		"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68"
+	}
+}
+
+错误码：
+- 40004
+AUTH.INVALID_PHONE_NUMBER
+AUTH.ACCOUNT_NOT_EXISTS
+AUTH.ACCOUNT_PASSWORD_ERROR
+SYSTEM_ERROR
+
+-------- 快捷登录接口 --------
+描述：
+URL：/quick_login
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"phone_number":"18911548237",
+		"verify_code":"678234"
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68"
+	}
+}
+
+错误码：
+- 40004
+AUTH.INVALID_PHONE_NUMBER
+AUTH.VERIFY_CODE_ERROR
+AUTH.ACCOUNT_NOT_EXISTS
+SYSTEM_ERROR
+
+-------- 用户注册接口 --------
+描述：
+URL：/register
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"phone_number":"18911548237",
+		"pwd":"123456", // MD5 32位加密
+		"verify_code":"678234"
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68",
+		"nickname":"sunnyboy", // 用户昵称
+		"head_url":"" // 用户头像
+	}
+}
+
+错误码：
+- 40004
+AUTH.INVALID_PHONE_NUMBER
+AUTH.INVALID_PASSWORD
+AUTH.VERIFY_CODE_ERROR
+AUTH.ACCOUNT_EXISTS
+SYSTEM_ERROR
+
+-------- 找回密码接口 --------
+描述：
+URL：/find_pwd
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"phone_number":"18911548237",
+		"new_pwd":"123456", // MD5 32位加密
+		"verify_code":"678234"
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // AUTH.VERIFY_CODE_ERROR
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 40004
+AUTH.INVALID_PHONE_NUMBER
+AUTH.INVALID_PASSWORD
+AUTH.VERIFY_CODE_ERROR		
+AUTH.ACCOUNT_NOT_EXISTS
+AUTH.NEW_PASSWORD_EQUAL_ORIGINAL
+SYSTEM_ERROR
+
+-------- 发送验证码接口 --------
+描述：
+URL：/send_code
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"use_type":"register", // 发送验证码用途：register注册，pwd_reset密码重置, bind_phone绑定手机号, quick_login快捷登录
+		"phone_number":"18911548237",
+		"image_code":"1xsy" // 图片验证码，可选
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"status":"OK" // OK发送成功，IMAGE_CODE需输入图片验证码
+		"code_num":6 // 短信验证码位数。
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+AUTH.INVALID_PHONE_NUMBER
+AUTH.INVALID_IMAGE_CODE
+AUTH.ACCOUNT_EXISTS	// use_type为register时返回
+AUTH.ACCOUNT_NOT_EXISTS // use_type为pwd_reset、quick_login时返回
+SYSTEM_ERROR
+
+-------- 获取验证图片 --------
+描述：
+URL：GET /verify_image?use_type=register&phone_number=18911548237
+请求：
+use_type=register // 发送验证码用途：register注册，pwd_reset密码重置, bind_phone绑定手机号, quick_login快捷登录
+phone_number=18911548237 // 手机号
+
+响应：
+图片二进制数据
+
+-------- 第三方登录接口 --------
+描述：
+URL：/third_login
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"login_type":"qq", // 登录类型, qq, wechat, weibo, docin
+		"third_info":
+		{
+			"unionid:"o3OPowuqAUdH5Cz6B8SGqF70keqU", // 用户唯一标识：豆丁取openid参数，其他的取友盟unionid参数。
+			"access_token":"123D10909690625BEA65C3DBE9590633",
+			"expires_in":7200, // 豆丁取expires_in参数，其他取友盟expiration参数。
+			"refresh_token":"123D10909690625BEA65C3DBE9590633",
+		}
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // 
+	"sub_msg":"",
+	"content":
+	{
+		"status":"OK", // 状态，OK登录成功，UNBIND_PHONE_NUMBER未绑定手机号
+		"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68" // status为OK时返回。
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 检查第三方绑定 --------
+描述：
+URL：/check_bind
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"phone_number":"18911548237",
+		"login_type":"qq", // 登录类型, qq, wechat, weibo, docin
+		"unionid:"o3OPowuqAUdH5Cz6B8SGqF70keqU", // 用户唯一标识：豆丁取openid参数，其他的取友盟unionid参数。
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // 
+	"sub_msg":"",
+	"content":
+	{		
+		"status":"BINDED"
+		// BINDED已绑定，
+		// BINDED_OTHER_THIRD_ACCOUNT手机号已绑定了第三方的其他账号，
+		// BINDED_OTHER_PHONE_NUMBER第三方账号已绑定了其他手机号，
+		// UNBIND手机号未绑定第三方的账号，
+		// UNREGISTER 未注册。
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+AUTH.INVALID_PHONE_NUMBER
+SYSTEM_ERROR
+
+-------- 第三方绑定接口 --------
+描述：
+URL：/third_bind
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"bind_mode":"bind_regd", // 绑定方式，bind_regd绑定已注册的账号，bind_unreg绑定未注册账号
+		"login_type":"qq", // 登录类型, qq, wechat, weibo, docin
+		"phone_number":"18911548237",
+		"verify_code":"678234",
+		"pwd":"123456"
+		"third_info":
+		{
+			"unionid:"o3OPowuqAUdH5Cz6B8SGqF70keqU", // 用户唯一标识：豆丁取openid参数，其他的取友盟unionid参数。
+			"access_token":"123D10909690625BEA65C3DBE9590633"
+			"expires_in":7200, // 豆丁取expires_in参数，其他取友盟expiration参数。
+			"refresh_token":"123D10909690625BEA65C3DBE9590633",
+			"nickname":"sunnyboy", // 豆丁取nickname参数，其他取友盟name参数。
+			"gender":"男", // 性别 男/女，豆丁缺省此参数，其他取友盟unionGender参数。
+			"iconurl":"https://thirdqq.qlogo.cn/qqapp/200010/7A18F47421AB144199FA2C68B6360499/100" // 豆丁取headimgurl参数，其他取友盟iconurl参数。
+		}
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // 
+	"sub_msg":"",
+	"content":
+	{
+		"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68"
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+AUTH.INVALID_PHONE_NUMBER
+AUTH.PHONE_NUMBER_HAS_BIND
+AUTH.THIRD_ACCOUNT_HAS_BIND
+AUTH.ACCOUNT_NOT_EXISTS
+AUTH.INVALID_PASSWORD
+AUTH.PASSWORD_ERROR
+AUTH.VERIFY_CODE_ERROR
+SYSTEM_ERROR
+
+-------- 获取登录用户账户信息 --------
+描述：
+URL：/account_info
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68",
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // 
+	"sub_msg":"",
+	"content":
+	{
+		"user_id":"100012",
+		"nickname":"sunnyboy", // 用户昵称
+		"head_url":"" // 用户头像
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+SYSTEM_ERROR
+
+-------- 首页轮播图接口 --------
+描述：
+URL：/home_banners
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"banners":
+		[
+			{
+				"id":"0-0-749-0", // id根据不同的type参数指定
+				"type":"video", // 轮播区域内容的类型：video视频, advert广告，subject专题，channel频道推荐
+				"cover_url":"", // 封面
+				"data":"", // 
+			}
+		]
+	}
+}
+
+错误码：
+- 40004
+SYSTEM_ERROR
+
+-------- 首页推荐频道接口 --------
+描述：
+URL：/home_channels
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"page_num":1, // 请求第几页
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+
+		"page_num":1, // 第几页
+		"page_count":"10", // 总页数
+		"page_size":5, // 每页多条
+		"total_count":50, // 总条数
+		"channels":
+		[
+			{
+				"name":"编辑推荐",
+				"videos":
+				[
+					{
+						"video_id":"123", // 视频id
+						"title":"如果使用PS，PS基础教程",
+						"nickname":"sunnyboy",
+						"head_url":"",
+						"play_count":345435,
+						"duration":180,
+						"cover_url":""
+					}
+				]
+			}
+		]
+	}
+}
+
+错误码：
+- 40004
+SYSTEM_ERROR
+
+-------- 首页列表接口 --------
+描述：
+URL：/home_list
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"banners":
+		[
+			{
+				"id":"0-0-749-0", // id根据不同的type参数指定
+				"type":"video", // 轮播区域内容的类型：video视频, advert广告，subject专题，channel频道推荐
+				"cover_url":"",
+				"data":"", // 
+			}
+		],
+		
+		"page_num":1, // 第几页
+		"page_count":"10", // 总页数
+		"page_size":5, // 每页多条
+		"total_count":50, // 总条数
+		
+		"channels":
+		[
+			{
+				"name":"编辑推荐",
+				"videos":
+				[
+					{
+						"video_id":"123", // 视频id
+						"title":"如果使用PS，PS基础教程",
+						"nickname":"sunnyboy",
+						"head_url":"",
+						"play_count":345435,
+						"duration":180,
+						"cover_url":""
+					}
+				]
+			}
+		]
+	}
+}
+
+错误码：
+- 40004
+SYSTEM_ERROR
+
+-------- 获取分类列表接口 --------
+描述：
+URL：/categories
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"categories":
+		[
+			{
+				"name":"生活",
+				"cover_url":"",
+			},
+			{
+				"name":"旅行",
+				"cover_url":"",
+			}
+		],
+		
+		"sort_list":
+		[
+			{
+				"sort_id":"all",
+				"name":"全部"
+			},
+			{
+				"sort_id":"hot",
+				"name":"热门"
+			}
+	}
+}
+
+错误码：
+- 40004
+SYSTEM_ERROR
+
+-------- 获取指定分类视频接口 --------
+描述：
+URL：/category_videos
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"category":"投资理财", // 根据指定分类返回视频
+		"sort":"hot" // 指定排序顺序，hot热门视频， all全部。
+		"page_num":1, // 第几页
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"page_num":1, // 第几页
+		"page_count":"10", // 总页数
+		"page_size":30, // 每页多条
+		"total_count":300, // 总条数
+		"videos":
+		[
+			{
+				"video_id":"123", // 视频id
+				"title":"如果使用PS，PS基础教程",
+				"nickname":"sunnyboy",
+				"head_url":"",
+				"play_count":345435,
+				"duration":180,
+				"cover_url":""
+			}
+		]
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取与指定视频关联的视频列表 --------
+描述：
+URL：/relative_videos
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"page_num":1, // 第几页
+		"video_id":"123", // 视频id
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"page_num":1, // 第几页
+		"page_count":"10", // 总页数
+		"page_size":30, // 每页多条
+		"total_count":300, // 总条数
+		"videos":
+		[
+			{
+				"video_id":"123", // 视频id
+				"title":"如果使用PS，PS基础教程",
+				"nickname":"sunnyboy",
+				"head_url":"",
+				"play_count":345435,
+				"duration":180,
+				"cover_url":""
+			}
+		]
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取用户上传的视频 --------
+描述：用户必须登录才能使用此接口
+URL：/upload_videos
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"type":"", // all获取用户所有上传的视频
+		"page_num":1, // 第几页
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"page_num":1, // 第几页
+		"page_count":"10", // 总页数
+		"page_size":30, // 每页多条
+		"total_count":300, // 总条数
+		"videos":
+		[
+			{
+				"video_id":"123", // 视频id
+				"title":"如果使用PS，PS基础教程",
+				"upload_time":"2019-02-05 12:23:54",
+				"status":"PUBLISHED"	// PUBLISHED已发布, UPLOADING上传中, INREVIEW审核中, CLIPPING剪辑中, 
+							// TRANSCODING转码中, REJECTED审核不通过, DELETED已删除	
+			}
+		]
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 订阅频道接口 --------
+描述：
+URL：/subscibe
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68",
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"action":"add", // add添加订阅，cancel取消订阅
+		"type":"user", // user用户频道
+		"user_id":"100012" 
+		
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取视频详情 --------
+描述：
+URL：/video_detail
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", (可选)
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"video_id":"123", // 视频id
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"video_id":"123", // 视频id
+		"type":"single", 
+		"user_id":"100012"
+		"title":"如果使用PS，PS基础教程",
+		"head_url":"",
+		"duration":180,
+		"cover_url":"",
+		"is_subscibe":true,
+		"share_count":0 // 分享次数
+		"intro":"", // 视频简介
+		"video_image":"",
+		"is_collect":false, // 是否收藏了视频
+		"collect_count":0 // 收藏次数
+		"video_urls":
+		{
+			"270p":"",
+			"360p":"",
+			"720p":"",
+			"1080p":"",
+		},
+		"video_sizes": 
+		{
+      			"1080p": 35075334,
+      			"270p": 4884199,
+     			"720p": 21776247,
+      			"360p": 5682726
+    		}
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取在线参数 --------
+描述：
+URL：/config
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"update_info":
+		{
+			"type":"required", // none不提示升级，required强制升级，optional不强制升级，ignore忽略此版本
+			"version":"1.0.1",
+			"title":"升级提示",
+			"desc":"发现新版本v1.1，现在去更新？",
+			"app_url":""
+		}
+	}
+}
+
+错误码：
+
+-------- 统计分享数据接口 --------
+描述：分享成功后调此接口上报分享数据
+URL：/report_share
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"share_type":"qq", // 分享类型, qq, qqzone, wechat_session, wechat_timeline, weibo
+		"video_id":"", // 分享的视频id
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 统计视频数据接口 --------
+描述：播放结束后调此接口上报视频数据
+URL：/report_video
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"type":"progress", // progress上报播放进度，play上报播放事件，已开始播放超过2秒
+		"video_id":"", // 视频id
+		"play_progress":50, // 播放进度，取值在0~100之间
+		
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 开始上传任务 --------
+描述：
+URL：/upload_start
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68",
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"upid":"" // 上传id,
+		"upver":"" // 上传文件版本号
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 文件上传接口 --------
+描述：
+URL：/upload_file
+请求：post, multipart/form-data;
+参数：
+action		// start开始上传，upload上传中，end上传结束。
+filename	// 文件名，取路径文件名(包括扩展名)
+file_size	// 文件大小
+chunk_count	// 分块总数
+file_md5	// 文件检验md5值，action=end时携带。
+chunk_num 	// 正在上传第几个分块chunk_num >= 0，action=upload时携带。
+chunk_size	// 每个分块大小，action=upload时携带。
+file		// 分块文件数据，action=upload时携带。
+value：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68",
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"upid":"" // 上传id,
+		"upver":"" // 上传文件版本号
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"file_status":"" // 文件上传状态，action=end时返回。
+					NOT_UPLOAD - 未上传；
+					UPLOADING - 上传中；
+					SUCCESS - 上传完成，检测通过；
+					WAIT_CHECK - 上传完成，等待检测；
+					CHECK_ERROR - 上传完成，检测失败，文件不符合规范；
+					MD5_ERROR - 上传完成，md5校验失败；
+					UPLOAD_ERROR - 上传完成，文件长度或文件名错误；
+					DUPLICATE_ERROR - 上传完成，文件重复。
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 提交上传任务 --------
+描述：
+URL：/upload_submit
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68",
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"upid":"" 	// 上传id,
+		"upver":"" 	// 上传文件版本号
+		"title":"",	// 标题
+		"category":"",	// 分类
+		"tag":""	// 标签
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 取消上传任务 --------
+描述：
+URL：/upload_cancel
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68",
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"upid":"" 	// 上传id,
+		"upver":"" 	// 上传文件版本号
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 查询上传状态 --------
+描述：
+URL：/upload_status
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68",
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"upid":"" 	// 上传id,
+		"upver":"" 	// 上传文件版本号
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"file_status":"" // 文件上传状态
+					NOT_UPLOAD - 未上传；
+					UPLOADING - 上传中；
+					SUCCESS - 上传完成，检测通过；
+					WAIT_CHECK - 上传完成，等待检测；
+					CHECK_ERROR - 上传完成，检测失败，文件不符合规范；
+					MD5_ERROR - 上传完成，md5校验失败；
+					UPLOAD_ERROR - 上传完成，文件长度或文件名错误；
+					DUPLICATE_ERROR - 上传完成，文件重复。
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取上传分类列表 --------
+描述：
+URL：/upload_categories
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"categories":
+		[
+			{
+				"name":"生活",
+				"cover_url":"",
+			},
+			{
+				"name":"旅行",
+				"cover_url":"",
+			}
+		]
+	}
+}
+
+错误码：
+- 40004
+SYSTEM_ERROR
+
+-------- 用户举报接口 --------
+描述：
+URL：/complain
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68",
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"video_id":"123", // 视频id
+		"complain_type":"", // 举报类型
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 屏蔽用户接口 --------
+描述：
+URL：/block_user
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68",
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"user_id":"123", // 用户id
+		"action":"blacklist" // blacklist拉黑用户，relieve解除拉黑
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 黑名单列表 --------
+描述：
+URL：/blacklist
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68",
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"page_num":1, // 第几页
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"page_num":1, // 第几页
+		"page_count":"10", // 总页数
+		"page_size":30, // 每页多条
+		"total_count":300, // 总条数
+		"list":
+		[
+			{
+				"user_id":"100012",
+				"nickname":"sunnyboy", // 用户昵称
+				"head_url":"" // 用户头像
+			}
+		]
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取用户信息 --------
+描述：
+URL：/user_profile
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68",
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"user_id":"100012",
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"nickname":"sunnyboy", // 昵称
+		"head_url":"" // 头像
+		"is_subscibe":true, // 是否被登录用户订阅
+		"is_blacklist":true, // 是否被登录用户拉黑
+		"video_count":0 // 已发布的视频总数
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取用户视频 --------
+描述：获取用户已发布的视频
+URL：/user_videos
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"user_id":"100012",
+		"page_num":1, // 第几页
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"page_num":1, // 第几页
+		"page_count":"10", // 总页数
+		"page_size":30, // 每页多条
+		"total_count":300, // 总条数
+		"videos":
+		[
+			{
+				"video_id":"123", // 视频id
+				"title":"如果使用PS，PS基础教程",
+				"nickname":"sunnyboy",
+				"head_url":"",
+				"play_count":345435,
+				"duration":180,
+				"cover_url":""
+			}
+		]
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 视频收藏操作接口 --------
+描述：登录用户添加或取消收藏视频
+URL：/user_collect
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68",
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"action":"add" // add添加收藏，cancel取消收藏
+		"video_id":"123", // 视频id
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取用户已收藏的视频 --------
+描述：获取登录用户已收藏的视频列表
+URL：/collect_videos
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68",
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"page_num":1, // 第几页
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"page_num":1, // 第几页
+		"page_count":"10", // 总页数
+		"page_size":30, // 每页多条
+		"total_count":300, // 总条数
+		"videos":
+		[
+			{
+				"video_id":"123", // 视频id
+				"title":"如果使用PS，PS基础教程",
+				"nickname":"sunnyboy",
+				"head_url":"",
+				"play_count":345435,
+				"duration":180,
+				"cover_url":""
+			}
+		]
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
