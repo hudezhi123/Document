@@ -1,0 +1,4 @@
+
+            storePassword "XzGu48iw"
+            keyAlias "ayou"
+            keyPassword "XzGu48iw"

@@ -1,0 +1,580 @@
+接口采用http协议+json数据格式，使用utf-8编码
+
+请求体结构：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 接口访问token（可选）
+	"version":"1.00", // 接口版本号（必选）
+	"app_version":"1.0.0", // app版本号
+	"system":"ios/12.0", //
+	"model":"iPhone 7,1", //
+	"screen":"768x1024", // 屏幕分辨率，宽x高
+	"udid":""
+	"content" // 业务数据
+	{
+		
+	}
+}
+
+响应体结构：
+{
+	"code":"0", 	// 公共返回码
+	"msg":"success",
+	"sub_code":"", 	// 业务错误码，客户端转大写后再判断。
+	"sub_msg":"",
+	"content"	// 返回业务数据
+	{
+		
+	}
+}
+
+code定义：
+0 - 处理成功
+10001 - 缺少必选参数
+10002 - 非法的参数
+10003 - 用户权限不足
+20000 - 服务不可用
+40004 - 业务处理失败
+
+code=40004的sub_code定义：
+SYSTEM_ERROR 			- 系统错误（通知相关开发人员）
+INVALID_PARAMETER 		- 参数无效
+
+AUTH.INVALID_PHONE_NUMBER 	- 手机号格式不正确
+AUTH.PASSWORD_ERROR 		- 密码错误
+AUTH.ACCOUNT_EXISTS 		- 账号已存在
+AUTH.ACCOUNT_NOT_EXISTS 	- 账号不存在
+AUTH.VERIFY_CODE_ERROR 		- 验证码错误
+AUTH.PHONE_NUMBER_HAS_BIND	- 手机号已绑定
+AUTH.INVALID_IMAGE_CODE		- 图片验证码不正确
+
+
+-------- 用户登录接口 --------
+描述：
+URL：/app/login
+请求：
+{
+	"version":"1.00",
+	"content":
+	{
+		"phone_number":"18911548237",
+		"pwd":"123456" // MD5 32位加密
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // 
+	"sub_msg":"",
+	"content":
+	{
+		"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68"
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+AUTH.PASSWORD_ERROR
+AUTH.INVALID_PHONE_NUMBER
+AUTH.ACCOUNT_NOT_EXISTS
+
+-------- 用户注册接口 --------
+描述：
+URL：/app/register
+请求：
+{
+	"version":"1.00",
+	"content":
+	{
+		"phone_number":"18911548237",
+		"pwd":"123456", // MD5 32位加密
+		"verify_code":"678234"
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68"
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+AUTH.INVALID_PHONE_NUMBER
+AUTH.VERIFY_CODE_ERROR
+AUTH.ACCOUNT_EXISTS
+SYSTEM_ERROR
+
+-------- 找回密码接口 --------
+描述：
+URL：/app/find_pwd
+请求：
+{
+	"version":"1.00",
+	"content":
+	{
+		"phone_number":"18911548237",
+		"new_pwd":"123456", // MD5 32位加密
+		"verify_code":"678234"
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // AUTH.VERIFY_CODE_ERROR
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+-------- 发送验证码接口 --------
+描述：
+URL：/app/send_code
+请求：
+{
+	"version":"1.00",
+	"content":
+	{
+		"use_type":"register", // 发送验证码用途：register注册，pwd_reset密码重置, bind_phone绑定手机号
+		"phone_number":"18911548237",
+		"image_code":"1xsy" // 图片验证码，可选
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"status":"OK" // OK发送成功，IMAGE_CODE需输入图片验证码
+		"code_num":6 // 短信验证码位数。
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+AUTH.INVALID_PHONE_NUMBER
+AUTH.INVALID_IMAGE_CODE
+SYSTEM_ERROR
+
+-------- 获取验证图片 --------
+描述：
+URL：GET /app/verify_image?use_type=register&phone_number=18911548237
+请求：
+use_type=register // 发送验证码用途：register注册，pwd_reset密码重置, bind_phone绑定手机号
+phone_number=18911548237 // 手机号
+
+响应：
+图片二进制数据
+
+-------- 第三方登录接口 --------
+描述：
+URL：/app/third_login
+请求：
+{
+	"version":"1.00",
+	"content":
+	{
+		"login_type":"qq", // 登录类型, qq, wechat, weibo, docin
+		"third_info":
+		{
+			"unionid:"o3OPowuqAUdH5Cz6B8SGqF70keqU", // 用户唯一标识：豆丁取openid参数，其他的取友盟unionid参数。
+			"access_token":"123D10909690625BEA65C3DBE9590633",
+			"expires_in":7200, // 豆丁取expires_in参数，其他取友盟expiration参数。
+			"refresh_token":"123D10909690625BEA65C3DBE9590633",
+		}
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // 
+	"sub_msg":"",
+	"content":
+	{
+		"status":"OK", // 状态，OK登录成功，UNBIND_PHONE_NUMBER未绑定手机号
+		"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68" // status为OK时返回。
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 第三方绑定接口 --------
+描述：
+URL：/app/third_bind
+请求：
+{
+	"version":"1.00",
+	"content":
+	{
+		"login_type":"qq", // 登录类型, qq, wechat, weibo, docin
+		"phone_number":"18911548237",
+		"verify_code":"678234",
+		"third_info":
+		{
+			"unionid:"o3OPowuqAUdH5Cz6B8SGqF70keqU", // 用户唯一标识：豆丁取openid参数，其他的取友盟unionid参数。
+			"access_token":"123D10909690625BEA65C3DBE9590633"
+			"expires_in":7200, // 豆丁取expires_in参数，其他取友盟expiration参数。
+			"refresh_token":"123D10909690625BEA65C3DBE9590633",
+			"nickname":"sunnyboy", // 豆丁取nickname参数，其他取友盟name参数。
+			"gender":"男", // 性别 男/女，豆丁缺省此参数，其他取友盟unionGender参数。
+			"iconurl":"https://thirdqq.qlogo.cn/qqapp/200010/7A18F47421AB144199FA2C68B6360499/100" // 豆丁取headimgurl参数，其他取友盟iconurl参数。
+		}
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // 
+	"sub_msg":"",
+	"content":
+	{
+		"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68"
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+AUTH.PHONE_NUMBER_HAS_BIND
+AUTH.VERIFY_CODE_ERROR
+AUTH.INVALID_PHONE_NUMBER
+
+-------- 首页轮播图接口 --------
+描述：
+URL：/app/home_banners
+请求：
+{
+	"version":"1.00",
+	"content":
+	{
+		
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"banners":
+		[
+			{
+				"id":"0-0-749-0", // id根据不同的type参数指定
+				"type":"video", // 轮播区域内容的类型：video视频, advert广告，subject专题，channel频道推荐
+				"cover_url":"",
+			}
+		]
+	}
+}
+
+-------- 首页推荐频道接口 --------
+描述：
+URL：/app/home_channels
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", (可选)
+	"version":"1.00",
+	"content":
+	{
+		"page_num":1, // 请求第几页
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+
+		"page_num":1, // 第几页
+		"page_count":"10", // 总页数
+		"page_size":5, // 每页多条
+		"total_count":50, // 总条数
+		"channels":
+		[
+			{
+				"name":"编辑推荐",
+				"videos":
+				[
+					{
+						"video_id":"123", // 视频id
+						"title":"如果使用PS，PS基础教程",
+						"nickname":"sunnyboy",
+						"head_url":"",
+						"play_count":345435,
+						"duration":180,
+						"cover_url":""
+					}
+				]
+			}
+		]
+	}
+}
+
+-------- 获取分类列表接口 --------
+描述：
+URL：/app/categories
+请求：
+{
+	"version":"1.00",
+	"content":
+	{
+		
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"categories":
+		[
+			{
+				"category_id":"1",
+				"name":"生活"
+			},
+			{
+				"category_id":"2",
+				"name":"旅行"
+			}
+		]
+	}
+}
+
+-------- 获取指定分类视频接口 --------
+描述：
+URL：/app/category_videos
+请求：
+{
+	"version":"1.00",
+	"content":
+	{
+		"category":"投资理财", // 根据指定分类返回视频
+		"sort":"hot" // 指定排序顺序，hot热门视频， all全部。
+		"page_num":1, // 第几页
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"page_num":1, // 第几页
+		"page_count":"10", // 总页数
+		"page_size":30, // 每页多条
+		"total_count":300, // 总条数
+		"videos":
+		[
+			{
+				"video_id":"123", // 视频id
+				"title":"如果使用PS，PS基础教程",
+				"nickname":"sunnyboy",
+				"head_url":"",
+				"play_count":345435,
+				"duration":180,
+				"cover_url":""
+			}
+		]
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+
+-------- 获取与指定视频关联的视频列表 --------
+描述：
+URL：/app/relative_videos
+请求：
+{
+	"version":"1.00",
+	"content":
+	{
+		"page_num":1, // 第几页
+		"video_id":"123", // 视频id
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"page_num":1, // 第几页
+		"page_count":"10", // 总页数
+		"page_size":30, // 每页多条
+		"total_count":300, // 总条数
+		"videos":
+		[
+			{
+				"video_id":"123", // 视频id
+				"title":"如果使用PS，PS基础教程",
+				"nickname":"sunnyboy",
+				"head_url":"",
+				"play_count":345435,
+				"duration":180,
+				"cover_url":""
+			}
+		]
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+
+-------- 订阅频道接口 --------
+描述：
+URL：/app/subscibe
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", （必选）
+	"version":"1.00",
+	"content":
+	{
+		"action":"add", // add添加订阅，cancel取消订阅
+		"type":"user", // user用户频道
+		"user_id":"100012" 
+		
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取视频详情 --------
+描述：
+URL：/app/video_detail
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", (可选)
+	"version":"1.00",
+	"content":
+	{
+		"video_id":"123", // 视频id
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"video_id":"123", // 视频id
+		"user_id":"100012"
+		"title":"如果使用PS，PS基础教程",
+		"head_url":"",
+		"duration":180,
+		"cover_url":"",
+		"is_subscibe":true,
+		"video_urls":
+		{
+			"270p":"",
+			"360p":"",
+			"720p":"",
+			"1080p":"",
+		}
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+
+-------- 获取在线参数 --------
+描述：
+URL：/app/config
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", (可选)
+	"version":"1.00",
+	"content":
+	{
+		
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+		"upgrade_version":"1.2.0"
+		"upgrade_info":
+		{
+			"type":"required", // none不升级，required强制升级，optional不强制升级，ignore忽略此版本
+			"title":"",
+			"desc":"",
+			"app_url":""
+		}
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER

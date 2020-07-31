@@ -1,0 +1,83 @@
+
+-------- 分类列表页点击播放视频 --------
+描述：在分类页面点击播放视频，由H5调App。
+函数：playVideoForCategory(data)
+
+参数：data // json字符串
+{
+	"category":"投资理财", // 分类
+	"sort":"hot" // 指定排序顺序，hot热门视频， all全部。
+	"page_info":
+	{
+		"page_num":1, // 第几页
+		"page_count":"10", // 总页数
+		"page_size":30, // 每页多条
+		"total_count":300, // 总条数
+	},
+	
+	"click_index": 1, // 点击位置,
+	"videos": // 视频列表
+	[{
+		"duration": 2356,
+		"cover_url": "http://192.168.2.52:8101/video/16917/16917.pic.jpg",
+		"head_url": "http://wx.qlogo.cn/mmopen/vPjficwtgTJA8P4CxxVGiaxU6ib8TE5A6ViaCeSIVhRq3RKyNlWC2Axcjq4nIoz7MRjsOJ8ymG91UwHJeVIxSMkMIxyodV1Bl2Fq/0",
+		"nickname": "Aman",
+		"title": "1电荷 导体和绝缘体",
+		"play_count": 65,
+		"video_id": "0-0-346-0"
+	}]
+}
+
+返回值：无
+
+-------- 更新分类列表页视频数据 --------
+描述：播放页返回时，更新分类页面视频数据，由App调H5。
+函数：updateVideosToCategory(data)
+
+参数：data // json字符串
+{
+	"category":"投资理财", // 分类
+	"sort":"hot" // 指定排序顺序，hot热门视频， all全部。
+	"page_info":
+	{
+		"page_num":1, // 第几页
+		"page_count":"10", // 总页数
+		"page_size":30, // 每页多条
+		"total_count":300, // 总条数
+	},
+
+	"play_index": 1, 	// 最后播放的位置
+	"videos": // 视频列表
+	[{
+		"duration": 2356,
+		"cover_url": "http://192.168.2.52:8101/video/16917/16917.pic.jpg",
+		"head_url": "http://wx.qlogo.cn/mmopen/vPjficwtgTJA8P4CxxVGiaxU6ib8TE5A6ViaCeSIVhRq3RKyNlWC2Axcjq4nIoz7MRjsOJ8ymG91UwHJeVIxSMkMIxyodV1Bl2Fq/0",
+		"nickname": "Aman",
+		"title": "1电荷 导体和绝缘体",
+		"play_count": 65,
+		"video_id": "0-0-346-0"
+	}]
+}
+
+返回值：无
+
+-------- 推荐列表页点击播放视频 --------
+描述：在推荐页面点击播放视频，由H5调App。
+函数：playVideoForRecommend(data)
+
+参数：data // json字符串
+{
+	"video": // 视频信息
+	{
+		"duration": 2356,
+		"cover_url": "http://192.168.2.52:8101/video/16917/16917.pic.jpg",
+		"head_url": "http://wx.qlogo.cn/mmopen/vPjficwtgTJA8P4CxxVGiaxU6ib8TE5A6ViaCeSIVhRq3RKyNlWC2Axcjq4nIoz7MRjsOJ8ymG91UwHJeVIxSMkMIxyodV1Bl2Fq/0",
+		"nickname": "Aman",
+		"title": "1电荷 导体和绝缘体",
+		"play_count": 65,
+		"video_id": "0-0-346-0"
+	}
+}
+
+返回值：无
+
