@@ -1,0 +1,2370 @@
+接口采用http协议+json数据格式，使用utf-8编码
+
+请求地址：
+	生产环境：https://ayou.docin.com/app/api/tick/
+	测试环境：https://192.168.2.69/app/api/tick/
+
+请求体结构：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 接口访问token（可选，登录成功后携带该参数）
+	"version":"1.00", // 接口版本号（必选）
+	"app_version":"1.0", // app版本号 （必选）
+	"platform":"iPhone", // 平台标识：iPhone, iPad, Android（必选）
+	"udid":"", // 设备标识（必选）
+	"content" // 业务数据
+	{
+		
+	}
+}
+
+响应体结构：
+{
+	"code":"0", 	// 公共返回码
+	"msg":"success",
+	"sub_code":"", 	// 业务错误码，客户端转大写后再判断。
+	"sub_msg":"",
+	"content"	// 返回业务数据
+	{
+		
+	}
+}
+
+-------- code定义：--------
+0 - 处理成功
+10001 - 缺少必选参数
+10002 - 非法的参数
+10003 - 授权权限不足
+20000 - 服务不可用
+40004 - 业务处理失败
+
+-------- sub_code定义 --------
+code=10001的sub_code定义：
+MISSING_PARAMETER 		- 缺少必选参数
+
+code=10002的sub_code定义：
+INVALID_PARAMETER 		- 非法的参数
+
+code=10003的sub_code定义：
+INVALID_ACCESS_TOKEN 		- 无效的访问令牌，用户需重新登录
+
+code=20000的sub_code定义：
+UNKNOW_ERROR 			- 系统未知错误
+
+code=40004的sub_code定义：
+AUTH.INVALID_PHONE_NUMBER 	- 手机号码格式不正确
+AUTH.INVALID_PASSWORD 		- 密码长度需为6-20位
+AUTH.NEW_PASSWORD_EQUAL_ORIGINAL- 重置密码与原密码相同
+AUTH.ACCOUNT_EXISTS 		- 手机号码已被注册
+AUTH.ACCOUNT_NOT_EXISTS 	- 账号不存在
+AUTH.VERIFY_CODE_ERROR 		- 短信验证码不正确
+AUTH.PHONE_NUMBER_HAS_BIND	- 手机号已被三方其他账号绑定
+AUTH.THIRD_ACCOUNT_HAS_BIND	- 三方账号已被其他手机号绑定
+AUTH.INVALID_IMAGE_CODE		- 图形验证码不正确
+AUTH.ACCOUNT_PASSWORD_ERROR 	- 账号或密码不正确
+AUTH.PASSWORD_ERROR 		- 密码不正确
+SUBS.BLOCKED_BY_USER		- 已被用户拉黑。
+SYSTEM_ERROR 			- 系统错误
+INVALID_PARAMETER 		- 参数无效
+
+-------- 用户注册接口 --------
+描述：
+URL：/auth/register
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"phone_number":"18911548237",
+		"pwd":"123456", // MD5 32位加密
+		"verify_code":"678234"
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68",
+		"nickname":"sunnyboy", // 用户昵称
+		"head_url":"" // 用户头像
+	}
+}
+
+错误码：
+- 40004
+AUTH.INVALID_PHONE_NUMBER
+AUTH.INVALID_PASSWORD
+AUTH.VERIFY_CODE_ERROR
+AUTH.ACCOUNT_EXISTS
+SYSTEM_ERROR
+
+-------- 用户登录接口 --------
+描述：
+URL：/auth/login
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"phone_number":"18911548237",
+		"pwd":"123456" // MD5 32位加密
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // 
+	"sub_msg":"",
+	"content":
+	{
+		"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68"
+	}
+}
+
+错误码：
+- 40004
+AUTH.INVALID_PHONE_NUMBER
+AUTH.ACCOUNT_NOT_EXISTS
+AUTH.ACCOUNT_PASSWORD_ERROR
+SYSTEM_ERROR
+
+-------- 快捷登录接口 --------
+描述：
+URL：/auth/quick_login
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"phone_number":"18911548237",
+		"verify_code":"678234"
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68"
+	}
+}
+
+错误码：
+- 40004
+AUTH.INVALID_PHONE_NUMBER
+AUTH.VERIFY_CODE_ERROR
+AUTH.ACCOUNT_NOT_EXISTS
+SYSTEM_ERROR
+
+-------- 第三方登录接口 --------
+描述：
+URL：/auth/third_login
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"login_type":"qq", // 登录类型, qq, wechat, weibo, docin
+		"third_info":
+		{
+			"unionid:"o3OPowuqAUdH5Cz6B8SGqF70keqU", // 用户唯一标识：豆丁取openid参数，其他的取友盟unionid参数。
+			"access_token":"123D10909690625BEA65C3DBE9590633",
+			"expires_in":7200, // 豆丁取expires_in参数，其他取友盟expiration参数。
+			"refresh_token":"123D10909690625BEA65C3DBE9590633",
+		}
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // 
+	"sub_msg":"",
+	"content":
+	{
+		"status":"OK", // 状态，OK登录成功，UNBIND_PHONE_NUMBER未绑定手机号
+		"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68" // status为OK时返回。
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 绑定并登录第三方账号接口 --------
+描述：
+URL：/auth/bind_login
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"bind_mode":"bind_regd", // 绑定方式，bind_regd绑定已注册的账号，bind_unreg绑定未注册账号
+		"login_type":"qq", // 登录类型, qq, wechat, weibo, docin
+		"phone_number":"18911548237",
+		"verify_code":"678234", // 验证码，bind_mode="bind_unreg"时携带。
+		"pwd":"123456"
+		"third_info":
+		{
+			"unionid:"o3OPowuqAUdH5Cz6B8SGqF70keqU", // 用户唯一标识：豆丁取openid参数，其他的取友盟unionid参数。
+			"access_token":"123D10909690625BEA65C3DBE9590633"
+			"expires_in":7200, // 豆丁取expires_in参数，其他取友盟expiration参数。
+			"refresh_token":"123D10909690625BEA65C3DBE9590633",
+			"nickname":"sunnyboy", // 豆丁取nickname参数，其他取友盟name参数。
+			"gender":"男", // 性别 男/女，豆丁缺省此参数，其他取友盟unionGender参数。
+			"iconurl":"https://thirdqq.qlogo.cn/qqapp/200010/7A18F47421AB144199FA2C68B6360499/100" // 豆丁取headimgurl参数，其他取友盟iconurl参数。
+		}
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // 
+	"sub_msg":"",
+	"content":
+	{
+		"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68"
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+AUTH.INVALID_PHONE_NUMBER
+AUTH.PHONE_NUMBER_HAS_BIND
+AUTH.THIRD_ACCOUNT_HAS_BIND
+AUTH.ACCOUNT_NOT_EXISTS
+AUTH.INVALID_PASSWORD
+AUTH.PASSWORD_ERROR
+AUTH.VERIFY_CODE_ERROR
+SYSTEM_ERROR
+
+-------- 修改密码接口 --------
+描述：
+URL：/auth/change_pwd
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"phone_number":"18911548237",
+		"new_pwd":"123456", // MD5 32位加密
+		"verify_code":"678234"
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+AUTH.INVALID_PHONE_NUMBER
+AUTH.INVALID_PASSWORD
+AUTH.VERIFY_CODE_ERROR		
+AUTH.ACCOUNT_NOT_EXISTS
+AUTH.NEW_PASSWORD_EQUAL_ORIGINAL
+SYSTEM_ERROR
+
+-------- 找回密码接口 --------
+描述：
+URL：/auth/find_pwd
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"phone_number":"18911548237",
+		"new_pwd":"123456", // MD5 32位加密
+		"verify_code":"678234"
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // AUTH.VERIFY_CODE_ERROR
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 40004
+AUTH.INVALID_PHONE_NUMBER
+AUTH.INVALID_PASSWORD
+AUTH.VERIFY_CODE_ERROR		
+AUTH.ACCOUNT_NOT_EXISTS
+AUTH.NEW_PASSWORD_EQUAL_ORIGINAL
+SYSTEM_ERROR
+
+-------- 绑定新手机号接口 --------
+描述：
+URL：/auth/bind_phone
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"phone_number":"18911548237", // 新手机号
+		"verify_code":"678234" // 验证码
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // 
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+AUTH.INVALID_PHONE_NUMBER
+AUTH.VERIFY_CODE_ERROR
+SYSTEM_ERROR
+
+-------- 绑定第三方账号接口 --------
+描述：
+URL：/auth/bind_third
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"login_type":"qq", // 登录类型, qq, wechat, weibo, docin
+		"third_info":
+		{
+			"unionid:"o3OPowuqAUdH5Cz6B8SGqF70keqU", // 用户唯一标识：豆丁取openid参数，其他的取友盟unionid参数。
+			"access_token":"123D10909690625BEA65C3DBE9590633"
+			"expires_in":7200, // 豆丁取expires_in参数，其他取友盟expiration参数。
+			"refresh_token":"123D10909690625BEA65C3DBE9590633",
+			"nickname":"sunnyboy", // 豆丁取nickname参数，其他取友盟name参数。
+			"gender":"男", // 性别 男/女，豆丁缺省此参数，其他取友盟unionGender参数。
+			"iconurl":"https://thirdqq.qlogo.cn/qqapp/200010/7A18F47421AB144199FA2C68B6360499/100" // 豆丁取headimgurl参数，其他取友盟iconurl参数。
+		}
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+AUTH.THIRD_ACCOUNT_HAS_BIND
+AUTH.PHONE_NUMBER_HAS_BIND
+SYSTEM_ERROR
+
+-------- 获取第三方绑定列表 --------
+描述：
+URL：/auth/bind_list
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // 
+	"sub_msg":"",
+	"content":
+	{		
+
+		"bind_list"
+		[
+			"login_type":"qq", // 登录类型, qq, wechat, weibo, docin
+			"nickname":"sunnyboy", // 第三方账号昵称。status="BINDED"时返回。
+			"status":"BINDED" // 状态：BINDED已绑定，UNBIND未绑定。
+		]
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 检查第三方绑定 --------
+描述：
+URL：/auth/check_bind
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"phone_number":"18911548237",
+		"login_type":"qq", // 登录类型, qq, wechat, weibo, docin
+		"unionid:"o3OPowuqAUdH5Cz6B8SGqF70keqU", // 用户唯一标识：豆丁取openid参数，其他的取友盟unionid参数。
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // 
+	"sub_msg":"",
+	"content":
+	{		
+		"status":"BINDED"
+		// BINDED已绑定，
+		// BINDED_OTHER_THIRD_ACCOUNT手机号已绑定了第三方的其他账号，
+		// BINDED_OTHER_PHONE_NUMBER第三方账号已绑定了其他手机号，
+		// UNBIND手机号未绑定第三方的账号，
+		// UNREGISTER 未注册。
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+AUTH.INVALID_PHONE_NUMBER
+SYSTEM_ERROR
+
+-------- 解除第三方绑定 --------
+描述：
+URL：/auth/unbind
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"login_type":"qq", // 登录类型, qq, wechat, weibo, docin
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // 
+	"sub_msg":"",
+	"content":
+	{		
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 发送验证码接口 --------
+描述：
+URL：/auth/send_code
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"use_type":"register", // 发送验证码用途：register注册，pwd_reset密码重置, bind_phone绑定手机号, quick_login快捷登录, change_pwd修改密码。
+		"phone_number":"18911548237",
+		"image_code":"1xsy" // 图片验证码，可选
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"status":"OK" // OK发送成功，IMAGE_CODE需输入图片验证码
+		"code_num":6 // 短信验证码位数。
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+AUTH.INVALID_PHONE_NUMBER
+AUTH.INVALID_IMAGE_CODE
+AUTH.ACCOUNT_EXISTS	// use_type为register时返回
+AUTH.ACCOUNT_NOT_EXISTS // use_type为pwd_reset、quick_login、change_pwd时返回
+SYSTEM_ERROR
+
+-------- 验证短信验证码接口 --------
+描述：
+URL：/auth/verify_code
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"use_type":"register", // 发送验证码用途：register注册，pwd_reset密码重置, bind_phone绑定手机号, quick_login快捷登录, change_pwd修改密码。
+		"phone_number":"18911548237",
+		"verify_code":"834787" // 短信验证码
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+AUTH.INVALID_PHONE_NUMBER
+AUTH.VERIFY_CODE_ERROR
+SYSTEM_ERROR
+
+-------- 获取验证图片 --------
+描述：
+URL：GET /auth/verify_image?use_type=register&phone_number=18911548237
+请求：
+use_type=register // 发送验证码用途：register注册，pwd_reset密码重置, bind_phone绑定手机号, quick_login快捷登录, change_pwd修改密码。
+phone_number=18911548237 // 手机号
+
+响应：
+图片二进制数据
+
+-------- 获取登录用户账户信息 --------
+描述：
+URL：/account/account_info
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // 
+	"sub_msg":"",
+	"content":
+	{
+		"user_id":"100012",
+		"phone_number":"18911548237", // 手机号
+		"nickname":"sunnyboy", // 用户昵称
+		"head_url":"" // 用户头像
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+SYSTEM_ERROR
+
+-------- 获取我的主页信息 --------
+描述：
+URL：/account/my_center
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // 
+	"sub_msg":"",
+	"content":
+	{
+		"story_num":5, // 作品数量
+		"collect_num":4, // 收藏数量
+		"fans_num":2,	// 粉丝数量
+		"subscribe_num":3 // 订阅数量
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+SYSTEM_ERROR
+
+-------- 获取设置信息 --------
+描述：
+URL：/account/setting_info
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // 
+	"sub_msg":"",
+	"content":
+	{
+		"show_subscribed":true // 公开显示订阅过的用户，true显示、false不显示
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+SYSTEM_ERROR
+
+-------- 编辑设置信息 --------
+描述：
+URL：/account/edit_setting
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"show_subscribed":true // 公开显示订阅过的用户，true显示、false不显示
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // 
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+SYSTEM_ERROR
+
+-------- 开始上传新的故事 --------
+描述：
+URL：/upload/add_story
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"title":"", 	// 故事标题
+		"items":	// 故事标签
+		[
+			"text1",
+			"text2"
+		]
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"story_upid":"1001-1" // 故事上传id
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 开始上传新的分段 --------
+描述：
+URL：/upload/add_clip
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"story_upid":"1001-1", // 故事上传id
+		"text":"" // 分段文字描述
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"clip_upid":"2001-1" // 分段上传id
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 上传文件接口 --------
+描述：
+URL：/upload/upload_file
+请求：post, multipart/form-data;
+参数：
+action		// start开始上传，upload上传中，end上传结束。
+filename	// 文件名，取路径文件名(包括扩展名)
+file_size	// 文件大小
+chunk_count	// 分块总数
+file_md5	// 文件检验md5值，action=end时携带。
+chunk_num 	// 正在上传第几个分块chunk_num >= 0，action=upload时携带。
+chunk_size	// 每个分块大小，action=upload时携带。
+file		// 分块文件数据，action=upload时携带。
+value：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"type":"story_cover", // 上传类型：story_cover故事封面、clip_video分段视频、clip_image分段视频。
+		"is_edit":true,	      // 是否为编辑模式。
+		"story_upid":"1001-1", // 故事上传id
+		"clip_upid":"2001-1"   // 分段上传id
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 查询上传文件状态 --------
+描述：
+URL：/upload/file_status
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"type":"story_cover", // 上传类型：story_cover故事封面、clip_video分段视频、clip_image分段视频。
+		"is_edit":true,	      // 是否为编辑模式。
+		"story_upid":"1001-1", // 故事上传id
+		"clip_upid":"2001-1" // 分段上传id
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"file_status":"" // 文件上传状态
+					NOT_UPLOAD - 未上传；
+					UPLOADING - 上传中；
+					SUCCESS - 上传完成，检测通过；
+					WAIT_CHECK - 上传完成，等待校验；
+					FAILURE - 上传失败
+		"status_desc":"" // 状态描述
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 提交上传任务 --------
+描述：
+URL：/upload/commit
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"type":"story", 	 // 提交类型：story提交故事数据，publish提交发布故事。
+		"is_edit":true,		 // 是否为编辑模式。
+		"story_upid":"1001-1", 	 // 故事上传id，type="story"或"publish"时携带此参数。
+		"clip_upids":["12451-1"] // 分段上传id列表，type="publish"时携带此参数。
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取上传中的故事列表 --------
+描述：获取上传中故事列表
+URL：/upload/story_list
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"story_upids": // 上传中的故事id列表
+		[
+			"1234-1",
+			"4567-1"
+		]
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"story_list": // 上传中的故事列表
+		[
+			{
+				"story_upid":"123", // 上传中的故事id
+				"status":"UNCOMMIT" // 状态：UNCOMMIT故事的信息和封面未提交, COMMITTED故事的信息和封面已提交。
+			}
+		]
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取故事的上传中列表 --------
+描述：获取故事的上传中列表
+URL：/upload/upload_list
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"story_upids": // 上传中的故事id列表
+		[
+			"1234-1",
+			"4567-1"
+		]
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"upload_list": // 上传中的故事列表
+		[
+			{
+				"story_info": 
+				{
+					"story_upid":"123", // 上传中的故事id
+					"status":"UNCOMMIT" // 状态：UNCOMMIT故事的信息和封面未提交, COMMITTED故事的信息和封面已提交。
+				},
+				
+				"clip_list":
+				[
+					{
+						"clip_upid":"2001-1",	// 上传中的分段id
+						"file_status":"" // 文件上传状态
+								   NOT_UPLOAD - 未上传；
+								   UPLOADING - 上传中；
+								   SUCCESS - 上传完成，检测通过；
+								   WAIT_CHECK - 上传完成，等待校验；
+								   FAILURE - 上传失败
+					}
+				]
+			}
+
+		]
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 取消上传中故事任务 --------
+描述：
+URL：/upload/delete_story
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"story_upid":"1001-1", 	// 故事上传id。
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取编辑的故事信息接口 --------
+描述：
+URL：/upload/edit/story_info
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"story_id":"", 	// 故事id。
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"story_upid":"", // 故事上传id
+		"title":"故事1",	// 故事标题
+		"cover_url":"",	// 故事封面
+		"items":	// 故事标签
+		[
+			"text1",
+			"text2"
+		]
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取编辑的封面列表接口 --------
+描述：
+URL：/upload/edit/clip_covers
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"story_upid":"" // 故事上传id
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"cover_list":[], // 分段列表封面
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 更新编辑的故事信息接口 --------
+描述：
+URL：/upload/edit/update_story
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"story_upid":"", // 故事上传id
+		"title":"", 	// 故事标题
+		"items":	// 故事标签
+		[
+			"text1",
+			"text2"
+		]
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取故事列表接口 --------
+描述：获取我的故事列表或指定用户的故事列表
+URL：/user/story_list
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 可选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"type":"my", // my获取我的故事列表（必须先登录），user获取用户故事列表。
+		"user_id":"100012", // 指定用户id，type=user时使用。
+		"page_num":1, // 第几页
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"page_num":1, // 第几页
+		"page_count":"10", // 总页数
+		"page_size":30, // 每页多少条
+		"total_count":300, // 总条数
+		"story_list":
+		[
+			{
+				"story_id":"", // 故事id
+				"title":"故事1",	  // 故事标题
+				"cover_url":"",	  // 故事封面
+				"clip_num":10,	  // 分段数量，type=user时返回。
+				"play_count":43154 // 浏览总数
+				"like_count":657   // 好评总数，type=my时返回。
+				"status":"PUBLISHED" // 故事状态：PUBLISHED已发布, INREVIEW审核中, REJECTED审核不通过，type=my时返回。
+			}
+		]
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 登录用户删除故事接口 --------
+描述：登录用户删除故事接口
+URL：/user/delete_story
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"story_id":"123", // 故事id
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 不感兴趣接口 --------
+描述：对某个用户不感兴趣
+URL：/user/uninterest_user
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"user_id":"456", // 用户ID。
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 不感兴趣接口 --------
+描述：对某个故事不感兴趣
+URL：/user/uninterest_story
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"story_id":"", // 故事id
+		"clip_id":"1002-0" // 分段id（后台做统计用）
+		
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 拉黑用户操作接口 --------
+描述：拉黑/取消拉黑指定的用户
+URL：/user/block_user
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"action":"add", // add添加拉黑，cancel取消拉黑
+		"user_id":"456", // 用户ID。
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取黑名单列表接口 --------
+描述：获取黑名单列表
+URL：/user/blacklist
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"page_num":1, // 第几页
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"page_num":1, // 第几页
+		"page_count":"10", // 总页数
+		"page_size":30, // 每页多少条
+		"total_count":300, // 总条数
+		"list":
+		[
+			{
+				"user_id":"100012",
+				"nickname":"sunnyboy", // 用户昵称
+				"head_url":"" // 用户头像
+				"intro":"" // 简介
+			}
+		]
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 举报作品接口 --------
+描述：举报指定的作品
+URL：/user/report_story
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"story_id":"", // 故事id,
+		"report_type":1 // 举报类型：1-"政治敏感，违法违禁"
+					   2-"色情低俗，赌博诈骗"
+					   3-"人身攻击，垃圾广告"
+					   4-"血腥暴力，引人不适"
+					   5-"不良封面/标题"
+					   6-"盗用TA人作品"
+					   7-"青少年不良信息"
+					   8-"疑似自我伤害"
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 评价作品接口 --------
+描述：评价指定的作品
+URL：/user/rate_story
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"story_id":"", // 故事id
+		"clip_id":"1002-0", // 分段id（后台做统计用）
+		"rate_type":"like", // 评价类型：like顶、dislike踩。
+		"improve_list":[1,2,3] // 改进类型：1-步骤太多，2-低质量视频，3-信息不清楚。
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取用户主页信息 --------
+描述：
+URL：/user/user_center
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 可选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"user_id":"100012" // 用户ID
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"", // 
+	"sub_msg":"",
+	"content":
+	{
+		"is_subscribe":true // 是否订阅了用户，true已订阅，false未订阅。
+		"is_block_user":true, // 是否拉黑了用户。
+		"is_block_me":true, // 是否被用户拉黑了。
+		"is_show_subscribed", // 是否显示已订阅
+		"story_num":5, // 作品数量
+		"fans_num":2,	// 粉丝数量
+		"subscribe_num":3 // 订阅数量
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 用户已收藏的故事列表接口 --------
+描述：获取登录用户已收藏的故事列表
+URL：/collection/story_list
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"page_num":1, // 第几页
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"page_num":1, // 第几页
+		"page_count":"10", // 总页数
+		"page_size":30, // 每页多少条
+		"total_count":300, // 总条数
+		"story_list":
+		[
+			{
+				"story_id":"", // 故事id
+				"title":"故事1",	  // 故事标题
+				"cover_url":""	  // 故事封面
+			}
+		]
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 故事收藏操作接口 --------
+描述：登录用户添加或取消收藏故事
+URL：/collection/collect_story
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"action":"add" // add添加收藏，cancel取消收藏
+		"story_id":"123", // 故事id
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取粉丝列表接口 --------
+描述：获取指定用户的粉丝列表
+URL：/subscription/fans
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 可选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"user_id":"100012", // 指定用户id。
+		"page_num":1, // 第几页
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"page_num":1, // 第几页
+		"page_count":"10", // 总页数
+		"page_size":30, // 每页多少条
+		"total_count":300, // 总条数
+		"list":
+		[
+			{
+				"user_id":"100012",
+				"nickname":"sunnyboy", // 用户昵称
+				"head_url":"" // 用户头像,
+				"is_subscribe":true // true已订阅，false未订阅。
+			}
+		]
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 订阅用户操作接口 --------
+描述：添加或取消订阅用户
+URL：/subscription/subscribe_user
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"action":"add", // add添加订阅，cancel取消订阅
+		"user_id":"123", // 故事id。
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+SUBS.BLOCKED_BY_USER
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取订阅列表接口 --------
+描述：获取指定用户的订阅列表
+URL：/subscription/user_list
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 可选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"user_id":"100012", // 指定用户id。
+		"page_num":1, // 第几页
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"page_num":1, // 第几页
+		"page_count":"10", // 总页数
+		"page_size":30, // 每页多少条
+		"total_count":300, // 总条数
+		"list":
+		[
+			{
+				"user_id":"100012",
+				"nickname":"sunnyboy", // 用户昵称
+				"head_url":"", // 用户头像
+				"is_subscribe":true // true已订阅，false未订阅。
+			}
+		]
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 订阅主题标签操作接口 --------
+描述：添加或取消订阅主题标签
+URL：/subscription/subscribe_subject
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"action":"add", // add添加订阅，cancel取消订阅
+		"subject_id":"456", // 主题标签id。
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取主题标签列表接口 --------
+描述：获取指定用户的主题标签列表
+URL：/subscription/subject_list
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"user_id":"100012", // 指定用户id。
+		"page_num":1, // 第几页
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"page_num":1, // 第几页
+		"page_count":"10", // 总页数
+		"page_size":30, // 每页多少条
+		"total_count":300, // 总条数
+		"list":
+		[
+			{
+				"subject_id":"12",
+				"tag":"#Photographer", // 主题标签名称
+				"cover_url":"", // 主题标签封面
+				"story_num":97	// 作品数量
+				"is_subscribe":true // true已订阅，false未订阅。
+			}
+		]
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取所有主题标签列表接口 --------
+描述：获取所有主题标签列表（临时接口，测试订阅主题标签时使用）
+URL：/subject/subject_list
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 可选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"page_num":1, // 第几页
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"page_num":1, // 第几页
+		"page_count":"10", // 总页数
+		"page_size":30, // 每页多少条
+		"total_count":300, // 总条数
+		"list":
+		[
+			{
+				"subject_id":"12", // 主题标签ID
+				"tag":"#Photographer" // 主题标签名称
+			}
+		]
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取主题标签下的故事列表接口 --------
+描述：获取主题标签下“人气”和“最新”的故事列表
+URL：/subject/story_list
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 可选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"subject_id":"12", // 主题标签ID
+		"sort":"hot", // 排序类型：hot人气，newest最新。
+		"page_num":1, // 第几页
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"page_num":1, // 第几页
+		"page_count":"10", // 总页数
+		"page_size":30, // 每页多少条
+		"total_count":300, // 总条数
+		"story_list":
+		[
+			{
+				"story_id":"", // 故事id
+				"title":"故事1",	  // 故事标题
+				"cover_url":"",	  // 故事封面
+				"clip_num":10,	  // 分段数量
+				"play_count":43154 // 浏览总数
+			}
+		]
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取个人资料接口 --------
+描述：获取个人资料
+URL：/profile/profile_info
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"nickname":"", // 用户昵称
+		"gender":"male", // 性别：male男，female女
+		"trade":"", // 行业
+		"address":"", // 地区
+		"intro":"" // 简介
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 编辑个人资料接口 --------
+描述：编辑个人资料
+URL：/profile/edit_profile
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"nickname":"", // 用户昵称
+		"gender":"male", // 性别：male男，female女
+		"trade":"", // 行业
+		"address":"", // 地区
+		"intro":"" // 简介
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取行业列表接口 --------
+描述：获取行业列表
+URL：/profile/trade_list
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 可选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"trade_list":
+		[
+			"艺术娱乐",
+			"贸易零售",
+			"金融",
+			"高新科技"
+		]
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 上传用户头像接口 --------
+描述：
+URL：/profile/upload_photo
+请求：post, multipart/form-data;
+参数：
+file	// 文件数据。
+value：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 必选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"photo_url":""
+	}
+}
+
+错误码：
+- 10003
+INVALID_ACCESS_TOKEN
+
+- 40004
+SYSTEM_ERROR
+
+-------- 获取故事详细信息接口 --------
+描述：获取故事详细信息
+URL：/story/story_detail
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 可选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"story_id":"", // 故事id
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"story_id":"", // 故事id
+		"user_id":"", // 用户ID
+		"nickname":"", // 用户昵称
+		"head_url":"", // 用户头像
+		"title":"故事1",	  // 故事标题
+		"cover_url":"",	  // 故事封面
+		"clip_num":10,	  // 分段数量
+		"play_count":43154, // 浏览总数
+		"is_collect":true, // 是否收藏
+		"is_rate":true, // 是否已评价
+		"like_count":1,	// 好评总数
+		"is_subscribe":true // true已订阅，false未订阅。
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取分段列表接口 --------
+描述：获取指定故事的分段列表
+URL：/story/clip_list
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 可选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"story_id":"123" // 故事id
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"list":
+		[
+			{
+				"clip_id":"1002-0",
+				"preview_url":"", // 分段预览图片
+				"type":"image" // 分段类型：image图片，video视频 
+			}
+		]
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取分段详细信息接口 --------
+描述：获取分段详细信息
+URL：/story/clip_detail
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 可选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"clip_id":"1002-0"
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"clip_id":"1002-0",
+		"preview_url":"", // 分段预览图片
+		"type":"image", // 分段类型：image图片，video视频
+		"text":"", // 分段描述
+		"clip_image":"" // 分段图片url，type=image时返回。
+		"clip_videos"	// 分段视频数据，type= video时返回。
+		[
+			{
+				"resolution":"360p"
+				"video_url":""
+				
+			}
+		]
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 获取首页数据接口 --------
+描述：获取首页数据接列表
+URL：/story/home_list
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 可选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+		"section_list":
+		[
+			{
+				"title":"最受欢迎的",
+				"subtitle":"本周社区最受欢迎的故事",
+				"story_list":
+				[
+					{
+						"story_id":"", // 故事id
+						"title":"故事1",	  // 故事标题
+						"cover_url":"",	  // 故事封面
+						"clip_num":10,	  // 分段数量
+						"play_count":43154 // 浏览总数
+					}
+				]
+			}
+		]
+	}
+}
+
+错误码：
+- 40004
+SYSTEM_ERROR
+
+-------- 统计访问状态量接口 --------
+描述：统计访问状态量
+URL：/story/visit_state
+请求：
+{
+	"access_token":"5f32ce32cbbfc20a8deaa8115c339766599d4b68", // 可选
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+		"type":"play", // 统计类型：play播放量
+		"story_id":"", // 故事id
+		"clip_id":"" // 分段id
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		
+	}
+}
+
+错误码：
+- 40004
+INVALID_PARAMETER
+SYSTEM_ERROR
+
+-------- 更新app版本接口 --------
+描述：升级更新app新版本
+URL：/common/update_app
+请求：
+{
+	"version":"1.00",
+	"app_version":"1.0",
+	"platform":"iPhone",
+	"content":
+	{
+				
+	}
+}
+
+响应：
+{
+	"code":"0",
+	"msg":"success",
+	"sub_code":"",
+	"sub_msg":"",
+	"content":
+	{
+		"update_info":
+		{
+			"type":"required", // none不提示升级，required强制升级，optional不强制升级，ignore忽略此版本
+			"version":"1.0.1",
+			"title":"升级提示",
+			"desc":"发现新版本v1.1，现在去更新？",
+			"app_url":""
+		}
+	}
+}
+
+错误码：
+- 40004
+SYSTEM_ERROR
+
